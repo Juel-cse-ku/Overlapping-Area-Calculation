@@ -39,11 +39,12 @@ namespace Overlapping_Area_Calculation
             };
             Circle circleN = new Circle()
             {
-                a = 3,
+                a = 5,
                 b = 3,
-                r = 5
+                r = 8
             };
             Intersect_point(circleK, circleN);
+            Console.WriteLine(Intersect_Area_of_2_Circles(circleK, circleN));
 
             Console.WriteLine("\n\nProgram runned successfully...");
             Console.ReadLine();
@@ -95,7 +96,7 @@ namespace Overlapping_Area_Calculation
             var c = D - r1 + r2;
             var d = -D + r1 + r2;
             var area = Math.Sqrt(a * b * c * d) / 4;
-            Console.WriteLine(area);
+            //Console.WriteLine(area);
 
             var val_1 = (x1 + x2) / 2 + (x2 - x1) * (r1 * r1 - r2 * r2) / (2 * D * D);
             var val_2 = 2 * (y1 - y2) * area / (D * D);
@@ -126,6 +127,72 @@ namespace Overlapping_Area_Calculation
             Console.WriteLine("x1: {0},y1: {1}\nx2: {2},y2: {3}",point1_x,point1_y,point2_x,point2_y);
 
             return list;
+        }
+
+        //getting intersecion area of two circle
+        static double Intersect_Area_of_2_Circles(Circle c1, Circle c2)
+        {
+            var pi = Math.PI;
+            var a = c1.a;
+            var b = c1.b;
+            var r1 = c1.r;
+            var c = c2.a;
+            var d = c2.b;
+            var r2 = c2.r;
+
+            var D = Math.Sqrt((c - a) * (c - a) + (d - b) * (d - b));
+
+            if(D < Math.Abs(r1-r2))
+            {
+                if(r1 >r2)
+                {
+                    return pi * r2 * r2;
+                }
+                else
+                {
+                    return pi * r1 * r1;
+                }
+            }
+            else if (D > r1 + r2)
+            {
+                return 0;
+            }
+            else if(D == r1+r2)
+            {
+                return 0;
+            }
+            else
+            {
+                var aa = (r1*r1 - r2*r2 + D*D) / (2*D);
+                var bb = (r2*r2 - r1*r1 + D*D) / (2*D);
+                var theta_1 = 2 * Math.Acos(aa / r1);
+                var theta_2 = 2 * Math.Acos(bb / r2);
+
+                double area_1 = 0;
+                double area_2 = 0;
+
+                if(theta_1 > pi)
+                {
+                    area_1 = r2 * r2 * (theta_2 + Math.Sin((2 * pi - theta_2))) / 2;
+                }
+                else
+                {
+                    area_1 = r2 * r2 * (theta_2 - Math.Sin(theta_2)) / 2;
+                }
+
+                if(theta_2 > pi)
+                {
+                    area_2 = r1 * r1 * (theta_1 + Math.Sin((2 * pi - theta_1))) / 2;
+                }
+                else
+                {
+                    area_2 = r1 * r1 * (theta_1 - Math.Sin(theta_1)) / 2;
+                }
+
+                return area_1 + area_2;
+            }
+
+            
         }
     }
 }
