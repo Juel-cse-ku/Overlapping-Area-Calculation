@@ -15,13 +15,14 @@ namespace Overlapping_Area_Calculation
             public double b { get; set; }
             public double r { get; set; }
         }
-        class Position
+        class Point
         {
             public double X { get; set; }
             public double Y { get; set; }
+            //public double X2 { get; set; }
+            //public double Y2 { get; set; }
         }
             
-
         static void Main(string[] args)
         {
             //circlr data read and print in console
@@ -31,20 +32,46 @@ namespace Overlapping_Area_Calculation
                 var newLine = string.Format("{0},{1},{2}",circle.X,circle.Y,circle.R);
                 Console.WriteLine(newLine);
             }*/
-            Circle circleK = new Circle()
+            Circle c1 = new Circle()
             {
-                a = 5,
+                a = -2,
+                b = 3.5,
+                r = 1
+            };
+            Circle c2 = new Circle()
+            {
+                a = 3,
                 b = 2,
-                r = 7
+                r = 6
             };
-            Circle circleN = new Circle()
+            Circle c3 = new Circle()
             {
-                a = 5,
-                b = 3,
-                r = 8
+                a = -6,
+                b = 4,
+                r = 4
             };
-            Intersect_point(circleK, circleN);
-            Console.WriteLine(Intersect_Area_of_2_Circles(circleK, circleN));
+            var circles = Read_Circle();
+
+            /*for(int i=0;i< circles.Count();i++)
+            {
+                double area = 0;
+                for(int j=i+1;j<circles.Count();j++)
+                {
+                    //Intersect_point(circles[i], circles[j]);
+                    //area += Intersect_Area_of_2_Circles(circles[i], circles[j]);
+                }
+                //Console.WriteLine(area);
+            }*/
+            //Intersect_point_(c1,c2);
+            //var points = Intersect_points_of_2_Circles(c1, c2);
+            // Console.WriteLine("x1: {0},y1: {1}\nx2: {2},y2: {3}", points.X1, points.Y1, points.X2, points.Y2);
+            //foreach(var n in points)
+            // {
+            //     Console.WriteLine("{0},{1}", n.X,n.Y);
+            // }
+
+            var points = Point_Inside_Circle(c1, c2, c3);
+            Console.WriteLine(points);
 
             Console.WriteLine("\n\nProgram runned successfully...");
             Console.ReadLine();
@@ -72,9 +99,9 @@ namespace Overlapping_Area_Calculation
         }
 
         //getting intersection points
-        static IList<double> Intersect_point(Circle c1, Circle c2) //Circle circle_K, Circle circle_N
+        static IList<Point> Intersect_points_of_2_Circles(Circle c1, Circle c2) //Circle circle_K, Circle circle_N
         {
-            var list = new List<double>();
+            var list = new List<Point>();
 
             double x1 = c1.a;
             double y1 = c1.b;
@@ -119,12 +146,36 @@ namespace Overlapping_Area_Calculation
                 point2_y = temp;
             }
 
-            list.Add(point1_x);
-            list.Add(point1_y);
-            list.Add(point2_x);
-            list.Add(point2_y);
-
-            Console.WriteLine("x1: {0},y1: {1}\nx2: {2},y2: {3}",point1_x,point1_y,point2_x,point2_y);
+            if(!Double.IsNaN(point1_x) && !Double.IsNaN(point1_y))
+            {
+                //list.Add(point1_x);
+                //list.Add(point1_y);
+                Point point1 = new Point()
+                {
+                    X = point1_x,
+                    Y = point1_y,
+                };
+                list.Add(point1);
+            }
+            if (!Double.IsNaN(point2_x) && !Double.IsNaN(point2_y) && point1_x != point2_x && point1_y != point2_y)
+            {
+                //list.Add(point2_x);
+                //list.Add(point2_y);
+                Point point2 = new Point()
+                {
+                    X = point2_x,
+                    Y = point2_y,
+                };
+                list.Add(point2);
+            }
+            // Console.WriteLine("x1: {0},y1: {1}\nx2: {2},y2: {3}",point1_x,point1_y,point2_x,point2_y);
+            //return new Point()
+            //{
+            //    X1 = point1_x,
+            //    Y1 = point1_y,
+            //    X2 = point2_x,
+            //    Y2 = point2_y
+            //};
 
             return list;
         }
@@ -194,5 +245,148 @@ namespace Overlapping_Area_Calculation
 
             
         }
+
+        static double D(double x1, double y1, double x2,  double y2)
+        {
+            return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
+        }
+
+        static int Point_Inside_Circle(Circle c1, Circle c2, Circle c3)
+        {
+            var p_12 = Intersect_points_of_2_Circles(c1, c2); //betweeen circle 1 and 2
+            var p_13 = Intersect_points_of_2_Circles(c1, c3); //betweeen circle 1 and 3
+            var p_23 = Intersect_points_of_2_Circles(c2, c3); //betweeen circle 2 and 3
+
+            //var d1 = Math.Sqrt((p_12.X1 - c3.a) * (p_12.X1 - c3.a) + (p_12.Y1 - c3.b) * (p_12.Y1 - c3.b));
+            //var d2 = Math.Sqrt((p_12.X2 - c3.a) * (p_12.X2 - c3.a) + (p_12.Y2 - c3.b) * (p_12.Y2 - c3.b));
+
+            //var d3 = Math.Sqrt((p_13.X1 - c2.a) * (p_13.X1 - c2.a) + (p_13.Y1 - c2.b) * (p_13.Y1 - c2.b));
+            //var d4 = Math.Sqrt((p_13.X2 - c2.a) * (p_13.X2 - c2.a) + (p_13.Y2 - c2.b) * (p_13.Y2 - c2.b));
+
+            //var d5 = Math.Sqrt((p_23.X1 - c1.a) * (p_23.X1 - c1.a) + (p_23.Y1 - c1.b) * (p_23.Y1 - c1.b));
+            //var d6 = Math.Sqrt((p_23.X2 - c1.a) * (p_23.X2 - c1.a) + (p_23.Y2 - c1.b) * (p_23.Y2 - c1.b));
+
+            //if (c3.r > d1 || c3.r > d2 || c2.r > d3 || c2.r > d4 || c1.r > d5 || c1.r > d6)
+            //{
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
+            int points = 0;
+
+            foreach(var n in p_12)
+            {
+                if (c3.r > D(c3.a, c3.b, n.X, n.Y))
+                    points++;
+            }
+            foreach(var n in p_13)
+            {
+                if (c2.r > D(c2.a, c2.b, n.X, n.Y))
+                    points++;
+            }
+            foreach (var n in p_23)
+            {
+                if (c1.r > D(c1.a, c1.b, n.X, n.Y))
+                    points++;
+
+            }
+
+            return points;
+        }
+
+        static bool Circle_inside_Circle(Circle c1, Circle c2, Circle c3)
+        {
+            var D_12 = Math.Sqrt(Math.Pow(c1.a - c2.a, 2) + Math.Pow(c1.b - c2.b, 2));
+            var D_13 = Math.Sqrt(Math.Pow(c1.a - c3.a, 2) + Math.Pow(c1.b - c3.b, 2));
+            var D_23 = Math.Sqrt(Math.Pow(c2.a - c3.a, 2) + Math.Pow(c2.b - c3.b, 2));
+
+            if(Math.Abs(c1.r-c2.r) > D_12 || Math.Abs(c1.r - c3.r) > D_13 || Math.Abs(c2.r - c3.r) > D_23) //|| Math.Abs(c1.r - c3.r) > D_13 || && Math.Abs(c2.r - c3.r) > D_23
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        static bool Inside_Circle(Circle c1, Circle c2)
+        {
+            var D_12 = Math.Sqrt(Math.Pow(c1.a - c2.a, 2) + Math.Pow(c1.b - c2.b, 2));
+           // var D_13 = Math.Sqrt(Math.Pow(c1.a - c3.a, 2) + Math.Pow(c1.b - c3.b, 2));
+            //var D_23 = Math.Sqrt(Math.Pow(c2.a - c3.a, 2) + Math.Pow(c2.b - c3.b, 2));
+
+            if (Math.Abs(c1.r - c2.r) > D_12 ) //|| Math.Abs(c1.r - c3.r) > D_13 || && Math.Abs(c2.r - c3.r) > D_23
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        //inersect area calculation of 3 circles
+        static double Intersect_Area_of_3_Circles(Circle c1, Circle c2, Circle c3) //c1 is focal circle
+        {
+            var x1 = c1.a;
+            var y1 = c1.b;
+            var r1 = c1.r;
+            var x2 = c2.a;
+            var y2 = c2.b;
+            var r2 = c2.r;
+            var x3 = c3.a;
+            var y3 = c3.b;
+            var r3 = c3.r;
+
+            var D_12 = Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+            var D_13 = Math.Sqrt((x1 - x3) * (x1 - x3) + (y1 - y3) * (y1 - y3));
+            var D_23 = Math.Sqrt((x2 - x3) * (x2 - x3) + (y2 - y3) * (y2 - y3));
+
+            var intersect_pints_12 = Intersect_points_of_2_Circles(c1, c2);
+            var intersect_point_13 = Intersect_points_of_2_Circles(c1, c3);
+            var intersect_point_23 = Intersect_points_of_2_Circles(c2, c3);
+            
+
+            double intersect_area_12 = Intersect_Area_of_2_Circles(c1, c2);
+            double intersect_area_13 = Intersect_Area_of_2_Circles(c1, c3);
+            double intersect_area_23 = Intersect_Area_of_2_Circles(c2, c3);
+
+            double overlapped_area = intersect_area_12 + intersect_area_13;
+
+            if (Circle_inside_Circle(c1,c2,c3))
+            { 
+                if(c1.r < c2.r && c1.r < c3.r && Inside_Circle(c1,c2) && Inside_Circle(c1,c3))
+                {
+                    overlapped_area -= Math.PI * Math.Pow(c1.r, 2);
+                }
+                else if (c2.r < c1.r && c2.r < c3.r && Inside_Circle(c2, c1) && Inside_Circle(c2, c3))
+                {
+                    overlapped_area -= Math.PI * Math.Pow(c2.r, 2);
+                }
+                else if (c3.r < c1.r && c3.r < c2.r && Inside_Circle(c3, c1) && Inside_Circle(c3, c2))
+                {
+                    overlapped_area -= Math.PI * Math.Pow(c3.r, 2);
+                }
+            }
+            //else if (Point_Inside_Circle(c1, c1, c3)) //for fig 6 and 8
+            //{
+
+            //}
+
+
+
+
+
+
+
+
+
+            return overlapped_area;
+        }
     }
+
+
+
 }
