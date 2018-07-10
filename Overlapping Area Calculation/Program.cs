@@ -27,77 +27,71 @@ namespace Overlapping_Area_Calculation
         {
             Circle c1 = new Circle()
             {
-                a = -3,
-                b = -1,
-                r = 8
+                a = -5,
+                b = 2,
+                r = 5
             };
             Circle c2 = new Circle()
             {
-                a = -1,
-                b = 1,
-                r = 7
+                a = -4,
+                b = 2,
+                r = 4
             };
             Circle c3 = new Circle()
             {
-                a = 1,
-                b = 0,
-                r = 5.5
+                a = 2,
+                b = 2,
+                r = 9
             };
+            //Console.WriteLine(Intersect_Area_of_3_Circles(c1, c2, c3));
 
-            Console.WriteLine(Intersect_Area_of_3_Circles(c1, c2, c3));
             var circles = Read_Circle();
-
-            double[] shadedArea = new double[circles.Count()];
-
+            Console.WriteLine(circles.Count());
+            double[] shaded_area = new double[circles.Count()];
+            double[] conflict_area = new double[circles.Count()]; 
             for (int n = 0; n < circles.Count(); n++) 
-                shadedArea[n] = 0;
+            {
+                shaded_area[n] = 0;
+                conflict_area[n] = 0;
+            }
 
-            //for (int i = 0; i < circles.Count(); i++)
-            //{
-            //    for (int j = i + 1; j < circles.Count(); j++)
-            //    {
-            //        var overlapped_area1 = Intersect_Area_of_2_Circles(circles[i], circles[j]);
-                  
+            for (int i = 0; i < circles.Count(); i++) 
+            {
+                for (int j = 0; j < circles.Count(); j++) 
+                {
+                    if (i != j)
+                    {
+                        shaded_area[i] += Intersect_Area_of_2_Circles(circles[i], circles[j]);
+                    }
+                }
+                Console.WriteLine(shaded_area[i]);
+            }
+            Console.WriteLine("conflict area");
+            for (int i = 0; i < circles.Count(); i++)
+            {
+                for (int j = 0; j < circles.Count(); j++)
+                {
+                    if (i != j)
+                    {
+                        for (int k = j+1; k < circles.Count(); k++)
+                        {
+                            if (k != i && k != j)
+                            {
+                                conflict_area[i] += Intersect_Area_of_3_Circles(circles[i], circles[j], circles[k]);
 
-            //        shadedArea[i] += overlapped_area1;
-            //        shadedArea[j] += overlapped_area1;
+                            }
+                        }
 
-            //        Console.WriteLine("{0},{1}",shadedArea[i],shadedArea[j]);
-                    
-            //        for (int k = j + 1; k < circles.Count(); k++)
-            //        {
-            //            var overlapped_area2 = Intersect_Area_of_2_Circles(circles[i], circles[k]);
-
-            //            var conflict_area = Intersect_Area_of_3_Circles(circles[i], circles[j], circles[k]);
-
-                        
-            //            shadedArea[i] = shadedArea[i] + overlapped_area2 - conflict_area;
-            //            // Console.WriteLine(shadedArea[i]);
-            //            shadedArea[i] = shadedArea[i] / (3.1416 * circles[i].r * circles[i].r);
-            //           // Console.WriteLine(shadedArea[i]);
-            //        }
-            //    }
-            //    Console.WriteLine();
-                
-            //}
-
-            //for (int i = 0; i < circles.Count(); i++)
-            //{
-            //    for (int j = i+1; j < circles.Count(); j++) 
-            //    {
-            //        var overlapped_area = Intersect_Area_of_2_Circles(circles[i], circles[j]);
-            //        if (circles[i].r < circles[j].r) 
-            //        {
-            //            shadedArea[i] += overlapped_area * .09;// overlapped_area / (3.1416 * circles[i].r * circles[i].r);
-            //        }
-            //        else if(circles[i].r > circles[j].r)
-            //        {
-            //            shadedArea[j] += overlapped_area * .09;// overlapped_area / (3.1416 * circles[j].r * circles[j].r);
-            //        }
-
-            //    }
-            //        Console.WriteLine(shadedArea[i] / (3.1416 * circles[i].r * circles[i].r));
-            //}
+                    }
+                }
+                Console.WriteLine(conflict_area[i]);
+            }
+            Console.WriteLine();
+            for(int i=0;i<circles.Count();i++)
+            {
+                var A = shaded_area[i] - conflict_area[i];
+                Console.WriteLine(A / (Math.PI * circles[i].r * circles[i].r));
+            }
 
             Console.WriteLine("\n\nProgram runned successfully...");
             Console.ReadLine();
@@ -263,10 +257,67 @@ namespace Overlapping_Area_Calculation
             var area = r * r * Math.Asin(a / (2 * r)) - (a / 4) * Math.Sqrt(4 * r * r - a * a);
             return area;
         }
+        static double Segment_Area(Point p1, Point p2, Circle C, Circle c2, Circle c3)
+        {
+            var a = D(p1, p2);
+            var mx = (p1.X + p2.X) / 2;
+            var my = (p1.Y + p2.Y) / 2;
+
+            //Circle C, C2, C3;
+
+            double a1 = C.a;
+            double b1 = C.b;
+            double r1 = C.r;
+
+            var m = (b1 - my) / (a1 - mx);
+            var n = -(mx * (b1 - my)) / (a1 - mx) + my;
+            var sigma = r1 * r1 * (1 + m * m) - (b1 - m * a1 - n) * (b1 - m * a1 - n);
+
+            var x1 = (a1 + b1 * m - m * n + Math.Sqrt(sigma)) / (1 + m * m);
+            var x2 = (a1 + b1 * m - m * n - Math.Sqrt(sigma)) / (1 + m * m);
+
+            var y1 = (n + a1 * m + b1 * m * m + m * Math.Sqrt(sigma)) / (1 + m * m);
+            var y2 = (n + a1 * m + b1 * m * m - m * Math.Sqrt(sigma)) / (1 + m * m);
+
+            var D2 = D(x1, y1, c2.a, c3.a);
+            var D3 = D(x1, y1, c3.a, c3.b);
+
+            double x, y;
+
+            if (c2.r > D2 && c3.r > D3)
+            {
+                x = x1;
+                y = y1;
+            }
+            else
+            {
+                x = x2;
+                y = y2;
+            }
+
+            double theta;
+            if (C.r > D(x, y, mx, my))
+            {
+                theta = 2 * Math.Asin(a / (2 * r1));
+            }
+            else
+            {
+                theta = 2 * (Math.PI - Math.Asin(a / (2 * r1)));
+            }
+
+
+            return (r1 * r1 / 2) * (theta - Math.Sin(theta));
+
+
+        }
 
         static float D(double x1, double y1, double x2,  double y2)
         {
             return (float)Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
+        }
+        static float D(Point p1, Point p2)
+        {
+            return (float)Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
         }
 
         static int Point_Inside_Circle(Circle c1, Circle c2, Circle c3)
@@ -397,6 +448,7 @@ namespace Overlapping_Area_Calculation
             {
                 for(int j=i+1;j<points.Count();j++)
                 {
+                    var a = D(points[i].X, points[i].Y, points[j].X, points[j].Y);
                     var mx = (points[i].X + points[j].X) / 2;
                     var my = (points[i].Y + points[j].Y) / 2;
 
@@ -462,14 +514,15 @@ namespace Overlapping_Area_Calculation
                     double theta;
                     if (C.r > D(x, y, mx, my))
                     {
-                        theta = 2 * Math.Asin(a1 / (2 * r1));
+                        theta = 2 * Math.Asin(a / (2 * r1));
                     }
                     else
                     {
-                        theta = 2 * (Math.PI - Math.Asin(a1 / (2 * r1)));
+                        theta = 2 * (Math.PI - Math.Asin(a / (2 * r1)));
                     }
 
                     segment_area += (r1 * r1 / 2)*(theta - Math.Sin(theta));
+                    //Console.WriteLine(segment_area);
                 }
             }
             return segment_area;
@@ -503,19 +556,13 @@ namespace Overlapping_Area_Calculation
 
             double overlapped_area = intersect_area_12 + intersect_area_13;
             double conflict_area=0;
-           // Console.WriteLine(conflict_area);
 
-            //int common_points_3_circles=0;// = Point_Inside_Circle(c1, c1, c3);
             var points = Common_Circles(c1, c2, c3);
-            //var points = Point_Inside_Circle(c1, c2, c3);
-            //Console.WriteLine(points.Count());
-
+            
             if (Circle_inside_Circle(c1,c2,c3))
             {
-                //Console.WriteLine("************");
                 if(c1.r < c2.r && c1.r < c3.r && Inside_Circle(c1,c2) && Inside_Circle(c1,c3))
                 {
-                    //overlapped_area -= Math.PI * Math.Pow(c1.r, 2);
                     conflict_area = Math.PI * Math.Pow(c1.r, 2);
                    
                 }
@@ -531,14 +578,12 @@ namespace Overlapping_Area_Calculation
                 }
                 //Console.WriteLine(conflict_area);
             }
-           // overlapped_area -= conflict_area;
 
             if (points.Count() >=2) //for fig 7,9,10,11,12
             {
                 if (points.Count() == 2)
                 {
                     conflict_area = Intersect_Area_of_2_Circles(points[0].C1, points[0].C2);
-                    //Console.WriteLine(conflict_area);
                 }
                 else if (points.Count() == 3)
                 {
@@ -547,108 +592,63 @@ namespace Overlapping_Area_Calculation
                     var c = D(points[2].X, points[2].Y, points[0].X, points[0].Y);
 
                     var s = .5 * (a + b + c);
-                    // Console.Write("{0},{1},{2},{3},{4},{5}", points[0].X, points[0].Y, points[1].X, points[1].Y, points[2].X, points[2].Y);
-                    conflict_area = Math.Sqrt(s * (s - a) * (s - b) * (s - c));
-                    Console.WriteLine(Segment_Area_3_Points(points));
-                    // Console.WriteLine(conflict_area);
-                    //var seg1 = SegmentArea(points[0], points[1], points[0].C1.r==points[1].C1.r?points[);
-                    //var seg2 = SegmentArea(points[2], points[3], Math.Max(points[2].C1.r, points[2].C2.r));
-                    //var seg3 = SegmentArea(points[0], points[2], Math.Min(points[2].C1.r, points[2].C2.r));
-                    //Console.WriteLine(points.Count());
-                    //if (D(points[0].X, points[0].Y, c1.a, c1.b) < c1.r)
-                    //{
-                    //    var d = D(points[1].X, points[1].Y, points[2].X, points[2].Y);
-                    //    conflict_area += (c1.r * c1.r) * Math.Asin(d / (2 * c1.r)) - (d * Math.Sqrt(4 * c1.r * c1.r - d * d) / 4);
-                    //   // Console.WriteLine("111111111");
-                       
-                    //}
-                    //else if (D(points[0].X, points[0].Y, c2.a, c2.b) < c2.r)
-                    //{
-                    //    var d = D(points[1].X, points[1].Y, points[2].X, points[2].Y);
-                    //    conflict_area += (c2.r * c2.r) * Math.Asin(d / (2 * c2.r)) - (d * Math.Sqrt(4 * c2.r * c2.r - d * d) / 4);
-                    //    //Console.WriteLine("22222222222222");
-                    //}
-                    //else if (D(points[0].X, points[0].Y, c3.a, c3.b) < c3.r)
-                    //{
-                    //    var d = D(points[1].X, points[1].Y, points[2].X, points[2].Y);
-                    //    conflict_area += (c3.r * c3.r) * Math.Asin(d / (2 * c3.r)) - (d * Math.Sqrt(4 * c3.r * c3.r - d * d) / 4);
-                    //    //var segA = (c3.r * c3.r) * Math.Asin(d / (2 * c3.r)) - (d * Math.Sqrt(4 * c3.r * c3.r - d * d) / 4);
-                    //    // Console.WriteLine(segA);
-                    //   // Console.WriteLine("333333333");
-                    //    //var seg1 = SegmentArea(points[1], points[2],c3.r);
-                    //    //Console.WriteLine(seg1);
-                    //}
-                    ////overlapped_area -= conflict_area;
-
-                    //if (D(points[1].X, points[1].Y, c1.a, c1.b) < c1.r)
-                    //{
-                    //    var d = D(points[0].X, points[0].Y, points[2].X, points[2].Y);
-                    //    conflict_area += (c1.r * c1.r) * Math.Asin(d / (2 * c1.r)) - (d * Math.Sqrt(4 * c1.r * c1.r - d * d) / 4);
-                    //    //Console.WriteLine("111111111");
-                    //}
-                    //else if (D(points[1].X, points[1].Y, c2.a, c2.b) < c2.r)
-                    //{
-                    //    var d = D(points[0].X, points[0].Y, points[2].X, points[2].Y);
-                    //    conflict_area += (c2.r * c2.r) * Math.Asin(d / (2 * c2.r)) - (d * Math.Sqrt(4 * c2.r * c2.r - d * d) / 4);
-                    //   // Console.WriteLine("22222222222222");
-                    //}
-                    //else if (D(points[1].X, points[1].Y, c3.a, c3.b) < c3.r)
-                    //{
-                    //    var d = D(points[0].X, points[0].Y, points[2].X, points[2].Y);
-                    //    conflict_area += (c3.r * c3.r) * Math.Asin(d / (2 * c3.r)) - (d * Math.Sqrt(4 * c3.r * c3.r - d * d) / 4);
-                    //    //Console.WriteLine("3333333333");
-                    //}
-
-                    //if (D(points[2].X, points[2].Y, c1.a, c1.b) < c1.r)
-                    //{
-                    //    var d = D(points[0].X, points[0].Y, points[1].X, points[1].Y);
-                    //    conflict_area += (c1.r * c1.r) * Math.Asin(d / (2 * c1.r)) - (d * Math.Sqrt(4 * c1.r * c1.r - d * d) / 4);
-                    //   // Console.WriteLine("111111111");
-                    //}
-                    //else if (D(points[2].X, points[2].Y, c2.a, c2.b) < c2.r)
-                    //{
-                    //    var d = D(points[0].X, points[0].Y, points[1].X, points[1].Y);
-                    //    conflict_area += (c2.r * c2.r) * Math.Asin(d / (2 * c2.r)) - (d * Math.Sqrt(4 * c2.r * c2.r - d * d) / 4);
-                    //    //Console.WriteLine("22222222222222");
-                    //}
-                    //else if (D(points[2].X, points[2].Y, c3.a, c3.b) < c3.r)
-                    //{
-                    //    var d = D(points[0].X, points[0].Y, points[1].X, points[1].Y);
-                    //    conflict_area += (c3.r * c3.r) * Math.Asin(d / (2 * c3.r)) - (d * Math.Sqrt(4 * c3.r * c3.r - d * d) / 4);
-                    //    //Console.WriteLine("3333333333");
-                    //}
-
-                    //Console.WriteLine(conflict_area);
+                    conflict_area = Math.Sqrt(s * (s - a) * (s - b) * (s - c)) + Segment_Area_3_Points(points);
                 }
                 else if (points.Count() == 4)
                 {
-                    //Console.WriteLine("444444444");
-                    //Console.WriteLine(points[0].C2.r);
-                    //Console.WriteLine(points[0].C1.r);
-                    foreach (var n in points)
-                    {
-                        // Console.WriteLine("{0},{1},", n.X, n.Y);
-                        //Console.WriteLine(Math.Min(n.C1.r, n.C1.r));
-                    }
+                    var a = D(points[0], points[1]);
+                    var b = D(points[0], points[3]);
+                    var c = D(points[2], points[3]);
+                    var d = D(points[1], points[2]);
+
+                    var p = D(points[1], points[3]);
+                    var q = D(points[0], points[2]);
+
                     var seg1 = SegmentArea(points[0], points[1], Math.Max(points[0].C1.r, points[0].C2.r));
                     var seg2 = SegmentArea(points[2], points[3], Math.Max(points[2].C1.r, points[2].C2.r));
-                    var seg3 = SegmentArea(points[0], points[2], Math.Min(points[2].C1.r, points[2].C2.r));
-                    var seg4 = SegmentArea(points[1], points[3], Math.Min(points[1].C1.r, points[1].C2.r));
+                    var seg3 = SegmentArea(points[0], points[3], Math.Min(points[0].C1.r, points[0].C2.r));
+                    var seg4 = SegmentArea(points[1], points[2], Math.Min(points[1].C1.r, points[1].C2.r));
 
-                    var p = D(points[0].X, points[0].Y, points[3].X, points[3].Y);
-                    var q = D(points[1].X, points[1].Y, points[2].X, points[2].Y);
-                    var theta = 2 * Math.Asin(D(points[0].X, points[0].Y, points[2].X, points[2].Y)/(2*Math.Min(points[0].C1.r,points[0].C2.r)));
+                    //var segArea1 = Segment_Area(points[0], points[1], c2, c1, c3);
+                    //var segArea2 = Segment_Area(points[2], points[3], c3, c1, c2);
+                    //var segArea3 = Segment_Area(points[0], points[3], c1, c2, c3);
+                    //var segArea4 = Segment_Area(points[1], points[2], c1, c2, c3);
 
-                    var rectArea = .5 * p * q * Math.Sin(theta);
+                    var angle = Math.Acos((Math.Pow(a, 2) + Math.Pow(b, 2) - Math.Pow(q, 2)) / (2 * a * b)) + Math.Acos((c * c + b * b - q * q) / (2 * c * b)) + Math.Acos((c * c + d * d - p * p) / (2 * c * d)) + Math.Acos((a * a + d * d - q * q) / (2 * a * d));
 
-                    //Console.WriteLine(rectArea + seg1 + seg2 + seg3 + seg4);
-                    conflict_area = rectArea + seg1 + seg2 + seg3 + seg4;
+                    if ((angle * 180 / Math.PI) < 360)
+                    {
+                        a = D(points[0], points[1]);
+                        b = D(points[0], points[2]);
+                        c = D(points[2], points[3]);
+                        d = D(points[1], points[3]);
+
+                        p = D(points[1], points[2]);
+                        q = D(points[0], points[3]);
+
+                        seg1 = SegmentArea(points[0], points[1], Math.Max(points[0].C1.r, points[0].C2.r));
+                        seg2 = SegmentArea(points[2], points[3], Math.Max(points[2].C1.r, points[2].C2.r));
+                        seg3 = SegmentArea(points[0], points[2], Math.Min(points[0].C1.r, points[0].C2.r));
+                        seg4 = SegmentArea(points[1], points[3], Math.Min(points[1].C1.r, points[1].C2.r));
+                    }
+
+                    var s1 = .5 * (a + d + q);
+                    var s2 = .5 * (b + c + q);
+
+                    var t1 = Math.Sqrt(s1 * (s1 - a) * (s1 - d) * (s1 - q));
+                    var t2 = Math.Sqrt(s2 * (s2 - b) * (s2 - c) * (s2 - q));
+
+                    var rect_area = t1 + t2;
+                    var segment_area = seg1 + seg2 + seg3 + seg4;
+
+                    conflict_area = rect_area + segment_area;
+
                 }
             }
 
 
 
-                return conflict_area;
+            return conflict_area;
         }
     }
 
